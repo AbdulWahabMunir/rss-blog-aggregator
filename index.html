@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSS Blog Aggregator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      color: #333;
+    }
+    header {
+      background-color: #4a90e2;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    .feed-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1rem;
+      padding: 2rem;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .card h3 {
+      font-size: 1.1rem;
+      margin-top: 0;
+    }
+    .card p {
+      font-size: 0.9rem;
+    }
+    .card a {
+      text-decoration: none;
+      color: #4a90e2;
+      font-weight: bold;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #eee;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📰 RSS Blog Aggregator</h1>
+  </header>
+  <div class="feed-container" id="feed-container">
+    Loading blog posts...
+  </div>
+  <footer>
+    Built by ChatGPT & You • Hosted on GitHub Pages
+  </footer>
+
+  <script>
+    const feeds = [
+      'https://api.rss2json.com/v1/api.json?rss_url=https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://dribbble.com/shots/popular.rss',
+      'https://api.rss2json.com/v1/api.json?rss_url=https://www.smashingmagazine.com/feed/'
+    ];
+
+    const container = document.getElementById('feed-container');
+    container.innerHTML = '';
+
+    feeds.forEach(url => {
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          data.items.slice(0, 5).forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              <h3><a href="${item.link}" target="_blank">${item.title}</a></h3>
+              <p><strong>Source:</strong> ${data.feed.title}</p>
+              <p>${item.description.substring(0, 100)}...</p>
+            `;
+            container.appendChild(card);
+          });
+        })
+        .catch(err => {
+          const errorCard = document.createElement('div');
+          errorCard.className = 'card';
+          errorCard.innerHTML = `<p>Error loading feed: ${url}</p>`;
+          container.appendChild(errorCard);
+        });
+    });
+  </script>
+</body>
+</html>
